@@ -2,15 +2,15 @@
 
 ## Install
 
-        git clone https://github.com/pashinin/imgdir.git
-        cd imgdir
-        make install
+    git clone https://github.com/pashinin/imgdir.git
+    cd imgdir
+    make install
 
 ## Update (when you need)
 
-        cd /usr/src/imgdir
-        sudo git pull
-        make install
+    cd /usr/src/imgdir
+    sudo git pull
+    make install
 
 ## Usage
 
