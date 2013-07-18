@@ -1,19 +1,19 @@
-# imgdir
+# some scripts
 
 ## Install
 
-    git clone https://github.com/pashinin/imgdir.git
-    cd imgdir
+    git clone https://github.com/pashinin/scripts.git
+    cd scripts
     make install
 
 ## Update (when you need)
 
-    cd /usr/src/imgdir
+    cd /usr/src/scripts
     sudo git pull
     make install
 
 ## Usage
 
-1. Open a terminal in a directory with images
-2. Run "dir2djvu" command
-3. You have "dirname.djvu" from all images in the directory
+Create a djvu file with `dir2djvu` command when in a dir with images.
+
+Convert a zip-archive to 7z with `zip27z archive.zip` command.
