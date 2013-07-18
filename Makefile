@@ -1,15 +1,18 @@
 # -*- Makefile -*-
 
-EMACS = emacs
-TEST_DIR = src
-TRAVIS_FILE = .travis.yml
+DIR = /usr/src/scripts
 
-# Compile with noninteractive and relatively clean environment.
-BATCHFLAGS = -batch -q --no-site-file
+menu:
+	echo "Creating Nautilus menu items..."
+# How to use gconftool to create Nautilus menu items???
 
-install:
-#${EMACS} -L src $(BATCHFLAGS) -f batch-byte-compile $(TEST_DIR)/*.el
-# copy current dir to /usr/src
-	sudo cp -r . /usr/src/imgdir
-	sudo ln -sf /usr/src/imgdir/dir2djvu.py /usr/local/bin/dir2djvu
-#ln -s dir2djvu.py
+update:
+	test -d "${DIR}" || cp . "${DIR}"
+	git pull
+
+links:
+	sudo ln -sf ${DIR}/dir2djvu.py /usr/local/bin/dir2djvu
+	sudo ln -sf ${DIR}/zip27z.py /usr/local/bin/zip27z
+
+install: update links
+#install: menu
