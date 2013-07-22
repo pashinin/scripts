@@ -17,8 +17,6 @@ if __name__ == "__main__":
     parser.add_argument('-t', '--tempdir', default='/tmp', help="Directory to store temp files.")
     parser.add_argument('-d', '--dir', default='.', help="Directory to store temp files.")
     parser.add_argument('filename', help="Zip file to convert")
-    #parser.add_argument('-i', action='store_true')
-    #parser.add_argument('--png', action='store_true', default=True)
     args = parser.parse_args()
 
     filename = args.filename
@@ -40,7 +38,6 @@ if __name__ == "__main__":
         dirbase = os.path.basename(os.path.abspath(filename))
         f, ext = os.path.splitext(dirbase)    # "fname", ".ext"
         call(["7za", 'a', f+".7z", tmpdir+'/*'])    # make 7z
-        #shutil.copytree(tmpdir, os.path.join(args.dir, dirbase))
     except Exception, e:
         print("Error:", e)
     shutil.rmtree(tmpdir)   # delete tmp dir
