@@ -1,13 +1,14 @@
 # -*- Makefile -*-
 
-DIR = /usr/src/scripts
+# DIR = /usr/src/scripts
+DIR = `pwd`
 
 menu:
 	echo "Creating Nautilus menu items..."
 # How to use gconftool to create Nautilus menu items???
 
 update:
-	test -d "${DIR}" || cp . "${DIR}"
+	test -d "${DIR}" || sudo cp -r . "${DIR}"
 	git pull
 
 links:
@@ -16,5 +17,5 @@ links:
 	sudo ln -sf ${DIR}/ogg/oggart.sh /usr/local/bin/oggart
 	sudo ln -sf ${DIR}/ogg/oggcover64.py /usr/local/bin/oggcover64
 
-install: update links
+install: links
 #install: menu

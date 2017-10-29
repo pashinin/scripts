@@ -1,7 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from __future__ import print_function
-import os, sys
+import os
+import sys
 import fnmatch
 import tempfile
 import subprocess
@@ -38,6 +39,6 @@ if __name__ == "__main__":
         dirbase = os.path.basename(os.path.abspath(filename))
         f, ext = os.path.splitext(dirbase)    # "fname", ".ext"
         call(["7za", 'a', f+".7z", tmpdir+'/*'])    # make 7z
-    except Exception, e:
+    except Exception as e:
         print("Error:", e)
     shutil.rmtree(tmpdir)   # delete tmp dir
