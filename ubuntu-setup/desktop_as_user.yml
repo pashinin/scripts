@@ -34,6 +34,7 @@
     # git config --global user.name "Your Name"
     - shell: git config --global user.email "sergey@pashinin.com"
     - shell: git config --global user.name "Sergey Pashinin"
+    - shell: git config --global gpg.program gpg2
 
     # - name: get cluster state
     #   pacemaker_cluster: state=online
