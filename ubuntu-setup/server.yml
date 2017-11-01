@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: localhost
   remote_user: root
   connection: local
   gather_facts: yes
