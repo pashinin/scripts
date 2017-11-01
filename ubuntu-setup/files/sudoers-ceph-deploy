@@ -1,0 +1,1 @@
+ceph-deploy ALL = (root) NOPASSWD:ALL

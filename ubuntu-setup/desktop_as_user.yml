@@ -1,0 +1,51 @@
+---
+- hosts: desktop
+  connection: local
+  gather_facts: no
+
+  vars:
+    http_port: 80
+    max_clients: 200
+
+  tasks:
+
+    - name: PascalABC dir
+      file:
+        path: ~/Downloads/PABCNETC
+        state: directory
+        mode: 0755
+    - name: geany dir
+      file:
+        path: ~/.config/geany/filedefs
+        state: directory
+        mode: 0755
+    - name: Download PascalABC
+      unarchive:
+        src: http://pascalabc.net/downloads/PABCNETC.zip
+        dest: ~/Downloads/PABCNETC
+        remote_src: yes
+    - name: Geany config for Pascal
+      copy:
+        src: files/filetypes.pascal
+        dest: ~/.config/geany/filedefs/filetypes.pascal
+
+
+    # git config --global user.email "you@example.com"
+    # git config --global user.name "Your Name"
+    - shell: git config --global user.email "sergey@pashinin.com"
+    - shell: git config --global user.name "Sergey Pashinin"
+
+    # - name: get cluster state
+    #   pacemaker_cluster: state=online
+
+  # - name: ensure apache is at the latest version
+  #   yum: name=httpd state=latest
+  # - name: write the apache config file
+  #   template: src=/srv/httpd.j2 dest=/etc/httpd.conf
+  #   notify:
+  #   - restart apache
+  # - name: ensure apache is running (and enable it at boot)
+  #   service: name=httpd state=started enabled=yes
+  # handlers:
+  #   - name: restart apache
+  #     service: name=httpd state=restarted

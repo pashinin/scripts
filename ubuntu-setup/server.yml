@@ -1,0 +1,195 @@
+---
+- hosts: server
+  remote_user: root
+  connection: local
+  gather_facts: yes
+  become: true
+  become_user: root
+
+  vars:
+    http_port: 80
+    max_clients: 200
+
+  tasks:
+
+    # UUID=66441842-737f-4cf2-82d1-7933083a8ec3 /               ext4    defaults,noatime,discard,errors=remount-ro 0       1
+    # UUID=82dfaed0-c579-4829-b7d0-5bed264ff26f /usr/data/local2               ext4     defaults  0  2
+
+    - name: Dir for hdd mount
+      file:
+        path: /usr/data/local2
+        state: directory
+        mode: 0755
+
+
+    - name: Mount up device by UUID
+      mount:
+        path: /usr/data/local2
+        src: UUID=82dfaed0-c579-4829-b7d0-5bed264ff26f
+        fstype: ext4
+        opts: defaults
+        state: present
+
+        # pashinin.com:/usr/data/ISO /usr/data/ISO nfs noauto,rw,async,user
+
+    - name: PPAs
+      apt_repository: repo={{item}}
+      with_items:
+        - ppa:mozillateam/firefox-next  # beta firefox
+        - ppa:graphics-drivers/ppa  # nvidia drivers
+        - ppa:kelleyk/emacs  # emacs25 on Ubuntu 16.04
+
+    # - name: ensure docker repository key is installed
+    #   apt_key:
+    #     id: "58118E89F3A912897C070ADBF76221572C52609D"
+    #     keyserver: "hkp://p80.pool.sks-keyservers.net:80"
+    #     state: present
+    # - apt_repository:
+    #     repo: deb http://dl.google.com/linux/chrome/deb/ stable main
+    #     state: present
+   #      sudo add-apt-repository \
+   # "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   # $(lsb_release -cs) \
+   # stable"
+
+    - name: remove old ones
+      apt: name={{item}} state=removed
+      with_items:
+        - docker
+        - docker-engine
+        - docker.io
+
+    - name: yarn key
+      apt_key:
+        url: https://dl.yarnpkg.com/debian/pubkey.gpg
+        state: present
+    - apt_repository:
+        repo: deb https://dl.yarnpkg.com/debian/ stable main
+        state: present
+
+
+    - name: postgres 10 key
+      apt_key:
+        url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+        state: present
+    - apt_repository:
+        repo: deb http://apt.postgresql.org/pub/repos/apt/ {{ansible_distribution_release}}-pgdg main
+        state: present
+    - apt: name=postgresql-10 state=installed allow_unauthenticated=yes
+
+
+    - name: Some deps
+      apt: name={{item}} state=installed
+      with_items:
+        - chrome-gnome-shell  # gnome extensions in browser
+        - nfs-common  # mount NFS shares
+
+        # dev
+        - make
+        - emacs25
+        - vim
+        - yarn
+        - git
+        - python-pip
+        # - docker-ce
+
+        # Discord deps
+        - libgconf-2-4
+        - libappindicator1
+        - libc++1
+
+    - pip:
+        name: ceph-deploy
+
+    - user:
+        name: ceph-deploy
+        generate_ssh_key: yes
+        ssh_key_bits: 2048
+        ssh_key_file: .ssh/id_rsa
+
+    - copy:
+        src: files/sudoers-ceph-deploy
+        dest: /etc/sudoers.d/ceph-deploy
+        owner: root
+        group: root
+        mode: 0440
+
+    - name: nvidia drivers
+      apt:
+        name: nvidia-384
+
+
+    - name: Install latest Firefox
+      apt:
+        name: firefox
+        state: latest
+
+
+    # Skype
+    - name: Download Skype
+      get_url:
+        url: https://go.skype.com/skypeforlinux-64-preview.deb
+        dest: /tmp/skypeforlinux-64-preview.deb
+    - name: Install Skype
+      apt:
+        deb: /tmp/skypeforlinux-64-preview.deb
+
+
+    - name: steam download
+      get_url:
+        url: http://media.steampowered.com/client/installer/steam.deb
+        dest: /tmp/steam.deb
+    - name: Install Steam
+      apt:
+        deb: /tmp/steam.deb
+
+
+    # For students
+    # Geany + pascalabc + Krita + ...
+    - name: For students
+      apt: name={{item}} state=installed
+      with_items:
+        - geany
+        - mono-complete
+        - krita
+
+
+    - name: Install Blender
+      apt:
+        name: blender
+
+
+    - name: install pacemaker
+      apt: name={{item}} state=installed
+      with_items:
+        - pacemaker  # recourse manager
+    - shell: crm configure property no-quorum-policy=ignore
+    - shell: crm configure property stonith-enabled=false
+    - name: corosync.conf
+      copy:
+        src: files/corosync.desktop.conf
+        dest: /etc/corosync/corosync.conf
+        owner: root
+        group: root
+        mode: 0644
+      notify:
+        - restart corosync
+
+    # - name: get cluster state
+    #   pacemaker_cluster: state=online
+
+  # - name: ensure apache is at the latest version
+  #   yum: name=httpd state=latest
+  # - name: write the apache config file
+  #   template: src=/srv/httpd.j2 dest=/etc/httpd.conf
+  #   notify:
+  #   - restart apache
+  # - name: ensure apache is running (and enable it at boot)
+  #   service: name=httpd state=started enabled=yes
+  handlers:
+    - name: restart pacemaker
+      systemd: name=pacemaker state=restarted
+    - name: restart corosync
+      systemd: name=corosync state=restarted
+    # - name: restart apache
+    #   service: name=httpd state=restarted

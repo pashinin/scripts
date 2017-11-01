@@ -2,6 +2,10 @@
 
 # DIR = /usr/src/scripts
 DIR = `pwd`
+host = `hostname`
+
+ubuntu-desktop:
+	(cd ubuntu-setup; sh setup.sh)
 
 menu:
 	echo "Creating Nautilus menu items..."
@@ -19,3 +23,7 @@ links:
 
 install: links
 #install: menu
+
+
+cluster:
+	(cd ubuntu-setup; sh setup.sh)
