@@ -178,6 +178,23 @@
       notify:
         - restart corosync
 
+
+    # does not work!
+    # need daemon.json file
+    - lineinfile:
+        path: /etc/default/docker
+        regexp: '^DOCKER_OPTS='
+        line: 'DOCKER_OPTS="-g /usr/data/local2/vm/docker"'
+      notify:
+        - restart docker
+
+
+    - name: pips
+      pip: name={{item}}
+      with_items:
+        - sphinx
+        - sphinx_rtd_theme
+
     # - name: get cluster state
     #   pacemaker_cluster: state=online
 
@@ -194,5 +211,7 @@
       systemd: name=pacemaker state=restarted
     - name: restart corosync
       systemd: name=corosync state=restarted
+    - name: restart docker
+      systemd: name=docker state=restarted
     # - name: restart apache
     #   service: name=httpd state=restarted

@@ -1,0 +1,4 @@
+{
+    "graph": "/usr/data/local2/vm/docker",
+    "storage-driver": "overlay"
+}
