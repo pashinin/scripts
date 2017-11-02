@@ -5,7 +5,7 @@ DIR = `pwd`
 host = `hostname`
 
 ubuntu-desktop:
-	(cd ubuntu-setup; sh setup.sh)
+	(cd ubuntu-setup; sh desktop.sh)
 
 menu:
 	echo "Creating Nautilus menu items..."

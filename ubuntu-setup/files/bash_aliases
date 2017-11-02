@@ -1,0 +1,2 @@
+alias .s='ssh pashinin.com'
+alias .p='cd ~/src/pashinin.com'

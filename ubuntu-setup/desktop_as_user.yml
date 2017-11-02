@@ -36,6 +36,13 @@
     - shell: git config --global user.name "Sergey Pashinin"
     - shell: git config --global gpg.program gpg2
 
+
+
+    - name: bash aliases
+      copy:
+        src: files/bash_aliases
+        dest: ~/.bash_aliases
+
     # - name: get cluster state
     #   pacemaker_cluster: state=online
 
