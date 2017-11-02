@@ -28,3 +28,9 @@
         src: https://releases.hashicorp.com/consul/1.0.0/consul_1.0.0_linux_amd64.zip
         dest: /usr/local/bin
         remote_src: yes
+    - copy:
+        src: files/consul.service
+        dest: /etc/systemd/system/consul.service
+        owner: root
+        group: root
+        mode: 0755
