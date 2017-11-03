@@ -45,6 +45,6 @@
       notify:
         - restart consul
 
-    handlers:
-      - name: restart consul
-        systemd: name=consul state=restarted
+  handlers:
+    - name: restart consul
+      systemd: name=consul state=restarted
