@@ -10,6 +10,10 @@
     http_port: 80
     max_clients: 200
 
+  roles:
+    - consul
+
+
   tasks:
 
     # UUID=66441842-737f-4cf2-82d1-7933083a8ec3 /               ext4    defaults,noatime,discard,errors=remount-ro 0       1
