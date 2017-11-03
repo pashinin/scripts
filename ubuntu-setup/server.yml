@@ -34,9 +34,17 @@
         owner: root
         group: root
         mode: 0755
+      notify:
+        - restart consul
     - copy:
         src: files/consul.server.config.json
         dest: /etc/consul.d/server/consul.service
         owner: root
         group: root
         mode: 0755
+      notify:
+        - restart consul
+
+    handlers:
+      - name: restart consul
+        systemd: name=consul state=restarted
