@@ -1,0 +1,15 @@
+{
+    "bootstrap": false,
+    "server": true,
+    "datacenter": "moscow",
+    "data_dir": "/var/consul",
+    "log_level": "INFO",
+    "addresses": {
+        "http": "0.0.0.0",
+        "dns": "0.0.0.0"
+    },
+    "node_name": "server",
+    "telemetry": {
+        "statsite_address": "10.254.239.1:2180"
+    }
+}

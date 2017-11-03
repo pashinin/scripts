@@ -34,3 +34,9 @@
         owner: root
         group: root
         mode: 0755
+    - copy:
+        src: files/consul.server.config.json
+        dest: /etc/consul.d/server/consul.service
+        owner: root
+        group: root
+        mode: 0755
