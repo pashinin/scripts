@@ -10,6 +10,8 @@
     http_port: 80
     max_clients: 200
 
+  roles:
+    - consul
 
   tasks:
     - name: postgres 10 key
@@ -20,31 +22,3 @@
         repo: deb http://apt.postgresql.org/pub/repos/apt/ {{ansible_distribution_release}}-pgdg main
         state: present
     - apt: name=postgresql-10 state=installed allow_unauthenticated=yes
-
-
-    # https://releases.hashicorp.com/consul/1.0.0/consul_1.0.0_linux_amd64.zip
-    - name: Install Consul
-      unarchive:
-        src: https://releases.hashicorp.com/consul/1.0.0/consul_1.0.0_linux_amd64.zip
-        dest: /usr/local/bin
-        remote_src: yes
-    - copy:
-        src: files/consul.service
-        dest: /etc/systemd/system/consul.service
-        owner: root
-        group: root
-        mode: 0755
-      notify:
-        - restart consul
-    - copy:
-        src: files/consul.server.config.json
-        dest: /etc/consul.d/server/consul.service
-        owner: root
-        group: root
-        mode: 0755
-      notify:
-        - restart consul
-
-  handlers:
-    - name: restart consul
-      systemd: name=consul state=restarted
