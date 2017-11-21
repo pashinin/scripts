@@ -12,6 +12,7 @@
 
   roles:
     - consul
+    - redis
 
   tasks:
     - name: postgres 10 key

@@ -14,7 +14,7 @@ Environment=GOMAXPROCS=2
 # ExecStartPre=/usr/local/bin/consul validate /etc/consul.d/server/consul.json
 # ExecStart=/usr/local/bin/consul agent $OPTIONS -pid-file=/run/consul/consul.pid -config-dir=/etc/consul.d/server
 # ExecStart=/usr/local/bin/consul agent -bind=10.254.239.0 -config-dir=/etc/consul.d/server -server
-ExecStart=/usr/local/bin/consul agent -bind=10.254.239.0 -config-dir=/etc/consul.d/server -server
+ExecStart=/usr/local/bin/consul agent -config-dir=/etc/consul.d/server -server
 # consul agent -bind=10.254.239.1 -config-dir=/etc/consul.d/server -server
 ExecReload=/bin/kill -s HUP $MAINPID
 KillSignal=SIGTERM

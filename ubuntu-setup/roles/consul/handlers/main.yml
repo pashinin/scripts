@@ -1,2 +1,5 @@
 - name: restart consul
   systemd: name=consul state=restarted
+
+- name: restart consul-template
+  systemd: name=consul-template state=restarted

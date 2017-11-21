@@ -1,0 +1,38 @@
+{
+  "bootstrap": false,
+  "server": true,
+  "datacenter": "moscow",
+  "data_dir": "/var/consul",
+  "log_level": "INFO",
+  "bind_addr": "10.254.239.2",
+  "reconnect_timeout": "1440h",
+  "enable_script_checks": true,
+  "addresses": {
+    "http": "0.0.0.0",
+    "dns": "0.0.0.0"
+  },
+  "node_name": "desktop",
+  "telemetry": {
+    "statsite_address": "10.254.239.2:2180"
+  },
+  "performance": {
+    "raft_multiplier": 1
+  },
+  "services": [
+    {
+      "id": "red0",
+      "name": "redis",
+      "tags": [
+        "primary"
+      ],
+      "address": "",
+      "port": 6000,
+      "checks": [
+        {
+          "script": "service redis-server status",
+          "interval": "5s"
+        }
+      ]
+    }
+  ]
+}

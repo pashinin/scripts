@@ -1,0 +1,18 @@
+# -*- mode: conf -*-
+[Unit]
+Description=consul-template
+Requires=network-online.target
+After=network-online.target consul.service vault.service
+
+[Service]
+PIDFile=/run/consul/consul-template.pid
+EnvironmentFile=-/etc/sysconfig/consul-template
+ExecStart=/usr/local/bin/consul-template $OPTIONS -config=/etc/consul-template.d
+KillSignal=SIGINT
+
+Restart=on-failure
+# Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

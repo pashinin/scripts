@@ -1,22 +1,128 @@
 # https://releases.hashicorp.com/consul/1.0.0/consul_1.0.0_linux_amd64.zip
-- name: Install Consul
+- stat: path=/usr/local/bin/consul
+  register: binfile
+- stat: path=/usr/local/bin/consul-template
+  register: consultemplate
+
+- name: Install consul
   unarchive:
     src: https://releases.hashicorp.com/consul/1.0.0/consul_1.0.0_linux_amd64.zip
     dest: /usr/local/bin
     remote_src: yes
-- copy:
+  when: not binfile.stat.exists
+
+- name: Install consul-template
+  unarchive:
+    src: https://releases.hashicorp.com/consul-template/0.19.4/consul-template_0.19.4_linux_amd64.zip
+    dest: /usr/local/bin
+    remote_src: yes
+  when: not consultemplate.stat.exists
+
+
+# consul.service
+- name: Copy consul.service systemd script
+  copy:
     src: files/consul.service
     dest: /etc/systemd/system/consul.service
     owner: root
     group: root
-    mode: 0755
+    mode: 0644
   notify:
     - restart consul
-- copy:
-    src: files/consul.server.config.json
-    dest: /etc/consul.d/server/consul.service
+
+# consul-template.service
+- name: Copy SystemD consul-template.service
+  copy:
+    src: files/consul-template.service
+    dest: /etc/systemd/system/consul-template.service
     owner: root
     group: root
-    mode: 0755
+    mode: 0644
+  notify:
+    - restart consul-template
+
+# permissions
+- name: Check consul.service permissions
+  file:
+    path: /etc/systemd/system/consul.service
+    mode: 0644
   notify:
     - restart consul
+- name: Check consul-template.service permissions
+  file:
+    path: /etc/systemd/system/consul-template.service
+    mode: 0644
+  notify:
+    - restart consul-template
+
+
+# Configs
+- name: Create data_dir (/var/consul)
+  file:
+    path: /var/consul
+    state: directory
+    mode: 0755
+
+- file:
+    path: /etc/consul.d
+    state: directory
+    mode: 0755
+- file:
+    path: /etc/consul.d/server
+    state: directory
+    mode: 0755
+
+- file:
+    path: /etc/consul-template.d
+    state: directory
+    mode: 0755
+
+# - name: Consul server configuration
+#   copy:
+#     src: files/server.hcl
+#     dest: /etc/consul.d/server/config.hcl
+#     owner: root
+#     group: root
+#     mode: 0644
+#   notify:
+#     - restart consul
+
+- name: Consul server configuration
+  template:
+    src: templates/config.j2
+    dest: /etc/consul.d/server/config.hcl
+    # validate: '/usr/sbin/visudo -cf %s'
+  notify:
+    - restart consul
+
+- name: Remove old config.json
+  file:
+    path: /etc/consul.d/server/config.json
+    state: absent
+  notify:
+    - restart consul
+
+- name: Consul Template configuration
+  copy:
+    src: files/consul-template.cfg
+    dest: /etc/consul-template.d/consul-template.hcl
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart consul-template
+
+
+
+- name: start and enable Consul
+  systemd:
+    name: consul
+    state: started
+    enabled: yes
+
+
+- name: start and enable Consul-template
+  systemd:
+    name: consul-template
+    state: started
+    enabled: yes
