@@ -1,0 +1,18 @@
+- stat: path=/usr/bin/nodejs
+  register: binfile
+
+- name: Download setup_8.x
+  get_url:
+    url: https://deb.nodesource.com/setup_8.x
+    dest: /tmp/setup_8.x
+    mode: 0700
+  when: not binfile.stat.exists
+
+- name: asd
+  shell: bash /tmp/setup_8.x
+  when: not binfile.stat.exists
+
+- name: install nodejs
+  apt: name={{item}} state=installed
+  with_items:
+    - nodejs  # recourse manager
