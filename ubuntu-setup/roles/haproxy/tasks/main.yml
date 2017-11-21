@@ -1,0 +1,19 @@
+- name: PPAs
+  apt_repository: repo={{item}}
+  with_items:
+    - ppa:vbernat/haproxy-1.7
+- apt: name=haproxy state=latest
+# allow_unauthenticated=yes
+
+
+- name: HAProxy config
+  template:
+    src: templates/haproxy.j2
+    dest: /etc/haproxy/haproxy.cfg
+    # validate: '/usr/sbin/visudo -cf %s'
+  notify:
+    - reload haproxy
+
+
+- name: Make sure HAProxy is running
+  systemd: state=started name=haproxy
