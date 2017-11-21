@@ -1,0 +1,43 @@
+---
+- hosts: common
+  remote_user: root
+  # connection: local
+  gather_facts: yes
+  become: true
+  become_user: root
+
+  roles:
+    - {role: consul, tags: [ 'consul' ]}
+    - {role: ceph, tags: [ 'ceph' ]}
+    - {role: nodejs, tags: [ 'nodejs' ]}
+    - {role: redis, tags: [ 'redis' ]}
+    - {role: haproxy, tags: [ 'haproxy' ]}
+    - {role: dynomite, tags: [ 'dynomite' ]}
+
+  tasks:
+
+    - name: PPAs
+      apt_repository: repo={{item}}
+      with_items:
+        - ppa:jonathonf/python-3.6  # python-3.6
+
+    - name: yarn key
+      apt_key:
+        url: https://dl.yarnpkg.com/debian/pubkey.gpg
+        state: present
+    - apt_repository:
+        repo: deb https://dl.yarnpkg.com/debian/ stable main
+        state: present
+
+    - name: Some deps
+      apt: name={{item}} state=installed
+      with_items:
+        - nfs-common  # mount NFS shares
+        - python3.6
+        - python-virtualenv
+        - make
+        - yarn
+        - git
+        - python-pip
+        - curl
+        - nginx

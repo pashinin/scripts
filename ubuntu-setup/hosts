@@ -1,12 +1,23 @@
 localhost
 pashinin.com
+10.254.239.3
+
+[common]
+10.254.239.1
+10.254.239.2
+10.254.239.3
+
+
+[students]
+10.254.239.2
+10.254.239.3
+
 
 [server]
 pashinin.com
 
-
 [desktop]
-localhost
+10.254.239.2
 
-[localhost]
-localhost
+[student]
+10.254.239.3

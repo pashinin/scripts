@@ -24,7 +24,8 @@ gsettings set org.gnome.desktop.peripherals.keyboard repeat-interval 20
 
 # ansible all -m ping
 # ansible-playbook -i hosts desktop.yml --user root -f 10
-ansible-playbook -i hosts desktop.yml -f 10 --ask-become-pass
+# ansible-playbook -i hosts desktop.yml -f 10 --ask-become-pass
+ansible-playbook -i hosts desktop.yml -f 10
 ansible-playbook -i hosts desktop_as_user.yml -f 10
 
 # TODO: should check that "python" is available

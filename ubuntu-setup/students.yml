@@ -1,0 +1,20 @@
+---
+- hosts: students
+  remote_user: root
+  # connection: local
+  gather_facts: yes
+  become: true
+  become_user: root
+
+  tasks:
+
+    # For students
+    # Geany + pascalabc + Krita + ...
+    - name: For students
+      apt: name={{item}} state=installed
+      with_items:
+        - geany
+        - mono-complete
+        - playonlinux
+        # - lazarus  # useless, use Delphi under Wine
+        # - krita  # not from PPA on 16.04

@@ -1,7 +1,7 @@
 ---
 - hosts: desktop
   remote_user: root
-  connection: local
+  # connection: local
   gather_facts: yes
   become: true
   become_user: root
@@ -11,8 +11,7 @@
     max_clients: 200
 
   roles:
-    - consul
-
+    - {role: nodejs, tags: [ 'nodejs' ]}
 
   tasks:
 
@@ -25,14 +24,14 @@
         state: directory
         mode: 0755
 
-
-    - name: Mount up device by UUID
-      mount:
-        path: /usr/data/local2
-        src: UUID=82dfaed0-c579-4829-b7d0-5bed264ff26f
-        fstype: ext4
-        opts: defaults
-        state: present
+    # No more local2
+    # - name: Mount up device by UUID
+    #   mount:
+    #     path: /usr/data/local2
+    #     src: UUID=82dfaed0-c579-4829-b7d0-5bed264ff26f
+    #     fstype: ext4
+    #     opts: defaults
+    #     state: present
 
         # pashinin.com:/usr/data/ISO /usr/data/ISO nfs noauto,rw,async,user
 
@@ -43,6 +42,9 @@
         - ppa:graphics-drivers/ppa  # nvidia drivers
         - ppa:kelleyk/emacs  # emacs25 on Ubuntu 16.04
         - ppa:jonathonf/python-3.6  # python-3.6
+        - ppa:pmjdebruijn/darktable-release  # Darktable
+        - ppa:kritalime/ppa  # Krita
+        - ppa:libreoffice/ppa # LibreOffice
 
     # - name: ensure docker repository key is installed
     #   apt_key:
@@ -105,6 +107,8 @@
         - libappindicator1
         - libc++1
 
+        - texlive-full
+
     - pip:
         name: ceph-deploy
 
@@ -125,11 +129,26 @@
       apt:
         name: nvidia-384
 
+    - name: Install latest LibreOffice
+      apt:
+        name: libreoffice
+        state: latest
 
     - name: Install latest Firefox
       apt:
         name: firefox
         state: latest
+
+    - name: Install latest Darktable
+      apt:
+        name: darktable
+        state: latest
+
+    # only use ppa if > 16.04, 16.04 has old Krita
+    - name: Install latest Krita
+      apt:
+        name: krita
+        state: removed  # latest
 
 
     # Skype
@@ -158,7 +177,8 @@
       with_items:
         - geany
         - mono-complete
-        - krita
+        - lazarus
+        # - krita  # not from PPA on 16.04
 
 
     - name: Install Blender
@@ -167,11 +187,12 @@
 
 
     - name: install pacemaker
-      apt: name={{item}} state=installed
+      apt: name={{item}} state=absent  # absent installed
       with_items:
         - pacemaker  # recourse manager
-    - shell: crm configure property no-quorum-policy=ignore
-    - shell: crm configure property stonith-enabled=false
+        - corosync
+    # - shell: crm configure property no-quorum-policy=ignore
+    # - shell: crm configure property stonith-enabled=false
     - name: corosync.conf
       copy:
         src: files/corosync.desktop.conf
@@ -179,6 +200,7 @@
         owner: root
         group: root
         mode: 0644
+      when: false
       notify:
         - restart corosync
 
