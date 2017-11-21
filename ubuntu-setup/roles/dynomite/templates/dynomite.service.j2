@@ -1,0 +1,19 @@
+# -*- mode: conf -*-
+[Unit]
+Description=Dynomite
+Requires=network-online.target
+After=network.target
+
+[Service]
+# User=consul
+# Group=consul
+PIDFile=/run/dynomite/dynomite.pid
+Restart=on-failure
+Environment=GOMAXPROCS=2
+ExecStart=/usr/bin/dynomite -c /etc/dynomite/dynomite.conf
+ExecReload=/bin/kill -s HUP $MAINPID
+KillSignal=SIGTERM
+TimeoutStopSec=5
+
+[Install]
+WantedBy=multi-user.target

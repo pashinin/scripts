@@ -1,0 +1,94 @@
+# https://github.com/Netflix/dynomite
+- stat: path=/usr/src/dynomite
+  register: dir
+- stat: path=/usr/src/dynomite/src/dynomite
+  register: bin
+- stat: path=/usr/local/bin/consul-template
+  register: consultemplate
+- stat: path=/usr/src/dynomite/Makefile
+  register: makefile
+
+
+# - name: Clone dynomite repo
+#   shell: git clone --depth=1 https://github.com/Netflix/dynomite.git /usr/src/dynomite
+#   when: not dir.stat.exists
+- name: Clone dynomite repo
+  git:
+    repo: 'https://github.com/Netflix/dynomite.git'
+    dest: /usr/src/dynomite
+    version: v0.6.0
+
+- stat: path=/usr/src/dynomite/Makefile
+  register: makefile
+
+
+
+- name: Some deps
+  apt: name={{item}} state=installed
+  with_items:
+    - autoconf
+    - libssl-dev
+
+- name: Configure 1
+  shell: autoreconf -fvi
+  args:
+    chdir: /usr/src/dynomite
+    # creates: somelog.txt
+  when: not bin.stat.exists
+
+- name: Configure 2
+  shell: ./configure
+  args:
+    chdir: /usr/src/dynomite
+  when: not bin.stat.exists
+
+- name: Make
+  shell: make
+  args:
+    chdir: /usr/src/dynomite
+    creates: src/dynomite
+  when: not bin.stat.exists
+
+
+- copy:
+    src: /usr/src/dynomite/src/dynomite
+    dest: /usr/bin/dynomite
+    remote_src: yes
+    mode: 0755
+
+- file:
+    path: /etc/dynomite
+    state: directory
+    mode: 0755
+
+- name: dynomite configuration
+  template:
+    src: templates/config.j2
+    dest: /etc/dynomite/dynomite.conf
+    # validate: '/usr/sbin/visudo -cf %s'
+  # notify:
+  #   - restart consul
+
+
+
+- name: SystemD service
+  template:
+    src: templates/dynomite.service.j2
+    dest: /etc/systemd/system/dynomite.service
+    owner: root
+    group: root
+    mode: 0644
+  # notify:
+  #   - restart consul-template
+# - name: Check consul-template.service permissions
+#   file:
+#     path: /etc/systemd/system/consul-template.service
+#     mode: 0644
+#   notify:
+#     - restart consul-template
+
+- name: start and enable
+  systemd:
+    name: dynomite
+    state: started
+    enabled: yes

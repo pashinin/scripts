@@ -1,0 +1,30 @@
+# -*- mode: yaml -*-
+dyn_o_mite:
+  # The listening address and port (name:port or ip:port) for this server pool.
+  listen: 127.0.0.1:8102
+
+  # The port that dynomite nodes use to inter-communicate and gossip.
+  # dyn_listen: 127.0.0.1:8101
+  dyn_listen: 0.0.0.0:8101
+
+  # The token(s) owned by a node. Currently, we don't support vnode yet
+  # so this only works with one token for the time being.
+  tokens: '101134286'
+
+  # A list of local server address, port and weight (name:port:weight or
+  # ip:port:weight) for this server pool. Currently, there is just one.
+  servers:
+    - 127.0.0.1:6379:1
+
+  # An integer value that controls if a server pool speaks redis (0) or
+  # memcached (1) or other protocol. Defaults to redis (0).
+  data_store: 0
+
+  # size of mbuf chunk in bytes (default: 16384 bytes).
+  mbuf_size: 16384
+
+  # Deprecated
+  # max number of messages to allocate (default: 200000).
+  # max_msgs: 300000
+
+  stats_listen: 0.0.0.0:22222
