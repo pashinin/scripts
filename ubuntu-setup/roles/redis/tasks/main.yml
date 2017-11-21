@@ -1,0 +1,49 @@
+
+
+- name: PPAs
+  apt_repository: repo={{item}}
+  with_items:
+    - ppa:chris-lea/redis-server
+- apt: name=redis-server state=latest
+# allow_unauthenticated=yes
+
+
+
+# WARNING overcommit_memory is set to 0! Background save may fail under
+# low memory condition. To fix this issue add 'vm.overcommit_memory = 1'
+# to /etc/sysctl.conf and then reboot or run the command 'sysctl
+# vm.overcommit_memory=1' for this to take effect.
+
+- block:
+    - name: set vm.overcommit_memory = 1
+      sysctl: name=vm.overcommit_memory value=2 state=present reload=yes
+
+    - name: set vm.overcommit_ratio = 80
+      sysctl: name=vm.overcommit_ratio value=80 state=present reload=yes
+
+
+# WARNING you have Transparent Huge Pages (THP) support enabled in your
+# kernel. This will create latency and memory usage issues with
+# Redis. To fix this issue run the command 'echo never >
+# /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to
+# your /etc/rc.local in order to retain the setting after a
+# reboot. Redis must be restarted after THP is disabled.
+- stat: path=/sys/kernel/mm/transparent_hugepage/enabled
+  register: transparent_hugepage_stat
+
+- block:
+    - name: disable kernel.mm.transparent_hugepage
+      lineinfile: dest=/etc/rc.local line="echo never > /sys/kernel/mm/transparent_hugepage/enabled" insertbefore="exit 0"
+
+    - name: inject kernel.mm.transparent_hugepage
+      shell: "echo never > /sys/kernel/mm/transparent_hugepage/enabled && touch {{ansible_env.HOME}}/.kernel.mm.transparent_hugepage.never"
+      args:
+        creates: "{{ansible_env.HOME}}/.kernel.mm.transparent_hugepage.never"
+  tags: common
+  when: transparent_hugepage_stat.stat.exists == true
+  # notify:
+  #   - restart redis
+
+
+# WARNING: The TCP backlog setting of 511 cannot be enforced because
+# /proc/sys/net/core/somaxconn is set to the lower value of 128.
