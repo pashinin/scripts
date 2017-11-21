@@ -1,0 +1,40 @@
+- stat: path=/etc/ceph/secret.key
+  register: key
+
+# create "ceph-deploy" with root access
+- user:
+    name: ceph-deploy
+    generate_ssh_key: yes
+    ssh_key_bits: 2048
+    ssh_key_file: .ssh/id_rsa
+- copy:
+    src: files/sudoers-ceph-deploy
+    dest: /etc/sudoers.d/ceph-deploy
+    owner: root
+    group: root
+    mode: 0440
+
+
+- name: Dir for CephFS
+  file:
+    path: /mnt/ceph
+    state: directory
+    mode: 0775
+    owner: www-data
+    # group: foo
+
+
+# sudo ceph-authtool /etc/ceph/ceph.client.admin.keyring -p
+- name: Create key file
+  shell: ceph-authtool /etc/ceph/ceph.client.admin.keyring -p > /etc/ceph/secret.key
+  when: not key.stat.exists
+
+# fstab
+# sudo mount -t ceph 10.254.239.1:6789:/ /mnt/mycephfs -o name=admin,secret=`sudo ceph-authtool /etc/ceph/ceph.client.admin.keyring -p`
+- name: Mount CephFS
+  mount:
+    path: /mnt/ceph
+    src: 10.254.239.1:6789:/
+    fstype: ceph
+    opts: name=admin,secretfile=/etc/ceph/secret.key,noatime,_netdev,noauto,x-systemd.automount
+    state: mounted  # present mounted
